@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A contributor-friendly overview of project status, ownership, activity, and priority.">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <p class="eyebrow">Team overview</p>
+        <h1>Project Pulse</h1>
+        <p class="intro">A clear view of what the team is building, who is leading it, and where attention is needed next.</p>
+      </div>
+    </header>
+
+    <main class="dashboard container" aria-labelledby="projects-heading">
+      <div class="dashboard-heading">
+        <div>
+          <p class="eyebrow">In focus</p>
+          <h2 id="projects-heading">Current projects</h2>
+        </div>
+        <p id="project-count" class="project-count" aria-live="polite"></p>
+      </div>
+
+      <section id="project-list" class="project-grid" aria-label="Project updates">
+        <p class="loading-message">Loading project updates…</p>
+      </section>
+      <p id="error-message" class="error-message" role="alert" hidden>Project updates could not be loaded.</p>
+    </main>
+
+    <template id="project-card-template">
+      <article class="project-card">
+        <div class="project-card-header">
+          <div>
+            <p class="project-label">Project</p>
+            <h3 class="project-name"></h3>
+          </div>
+          <span class="status-badge" aria-label="Status"></span>
+        </div>
+        <dl class="project-details">
+          <div class="project-detail">
+            <dt>Owner</dt>
+            <dd class="project-owner"></dd>
+          </div>
+          <div class="project-detail">
+            <dt>Priority</dt>
+            <dd class="project-priority"></dd>
+          </div>
+        </dl>
+        <div class="project-activity">
+          <h4>Recent activity</h4>
+          <p class="project-recent-activity"></p>
+        </div>
+      </article>
+    </template>
+
+    <script>
+      (async function loadProjects() {
+        const projectList = document.querySelector("#project-list");
+        const projectCount = document.querySelector("#project-count");
+        const errorMessage = document.querySelector("#error-message");
+        const template = document.querySelector("#project-card-template");
+        const normalizeToken = (value) => String(value).trim().toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+        try {
+          const response = await fetch("project-data.json");
+          if (!response.ok) {
+            throw new Error(`Project data request failed with status ${response.status}`);
+          }
+
+          const data = await response.json();
+          if (!Array.isArray(data.projects)) {
+            throw new Error("Project data must contain a projects array");
+          }
+
+          projectList.replaceChildren();
+          projectCount.textContent = `${data.projects.length} ${data.projects.length === 1 ? "project" : "projects"}`;
+
+          data.projects.forEach((project) => {
+            const card = template.content.cloneNode(true);
+            card.querySelector(".project-name").textContent = project.name;
+            card.querySelector(".project-owner").textContent = project.owner;
+            const priorityElement = card.querySelector(".project-priority");
+            priorityElement.textContent = project.priority;
+            priorityElement.dataset.priority = normalizeToken(project.priority);
+            card.querySelector(".project-recent-activity").textContent = project.recentActivity;
+
+            const statusBadge = card.querySelector(".status-badge");
+            statusBadge.textContent = project.status;
+            statusBadge.setAttribute("aria-label", `Status: ${project.status}`);
+            statusBadge.dataset.status = normalizeToken(project.status);
+            projectList.appendChild(card);
+          });
+        } catch (error) {
+          projectList.replaceChildren();
+          projectCount.textContent = "";
+          errorMessage.hidden = false;
+          console.error("Unable to load Project Pulse data.", error);
+        }
+      }());
+    </script>
+  </body>
+</html>

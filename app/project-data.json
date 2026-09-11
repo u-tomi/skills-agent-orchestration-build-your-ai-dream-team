@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "name": "Atlas Workspace",
+      "owner": "Mona Patel",
+      "status": "On track",
+      "recentActivity": "Workspace search is now available to all contributors.",
+      "priority": "High"
+    },
+    {
+      "name": "Signal Insights",
+      "owner": "Jordan Lee",
+      "status": "In progress",
+      "recentActivity": "The first analytics dashboard review is scheduled for Friday.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Beacon Mobile",
+      "owner": "Alex Rivera",
+      "status": "At risk",
+      "recentActivity": "The release candidate is waiting on accessibility fixes.",
+      "priority": "Critical"
+    },
+    {
+      "name": "Northstar Docs",
+      "owner": "Priya Shah",
+      "status": "On track",
+      "recentActivity": "Contributor onboarding guidance has been refreshed.",
+      "priority": "Low"
+    }
+  ]
+}
